@@ -20,9 +20,10 @@ source ./sendgrid.env
 ## Install Package
 
 `go get github.com/sendgrid/sendgrid-go`
-
+`go get gopkg.in/guregu/null.v3`
 ```go
 import "github.com/sendgrid/sendgrid-go"
+import "gopkg.in/guregu/null.v3"
 ```
 
 
