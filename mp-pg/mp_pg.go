@@ -42,29 +42,45 @@ func checkErr(err error) {
 
 func GetBusinessIdsWhereDailyOrLowIsTrue() []int64 {
 	var businessIds []int64
-	db.Table("settings").Where("daily_sales_summary IS TRUE OR inventory_alerts IS TRUE").Pluck("business_id", &businessIds)
+	query := fmt.Sprintf("%s %s %s %s",
+		"SELECT id",
+		"FROM businesses",
+		"WHERE NOW() < expired_at ",
+		"AND id IN (SELECT business_id FROM settings WHERE daily_sales_summary IS TRUE OR inventory_alerts IS TRUE)")
+	db.Raw(query).Pluck("business_id", &businessIds)
+
 	return businessIds
 }
 
 func GetDailyBusinessIdRecipients() []int64 {
 	var businessIds []int64
-	db.Table("settings").Where("daily_sales_summary IS TRUE").Pluck("business_id", &businessIds)
+	query := fmt.Sprintf("%s %s %s %s",
+		"SELECT id",
+		"FROM businesses",
+		"WHERE NOW() < expired_at",
+		"AND id IN (SELECT business_id FROM settings WHERE daily_sales_summary IS TRUE)")
+	db.Raw(query).Pluck("business_id", &businessIds)
+
 	return businessIds
 }
 
 func GetLowInventoryBusinessIds() []int64 {
 	var businessIds []int64
 
-	query := fmt.Sprintf("SELECT %s FROM %s INNER JOIN %s INNER JOIN %s INNER JOIN %s WHERE %s AND %s AND %s AND %s",
-		"DISTINCT o.business_id",
-		"item_variants iv",
-		"items i on i.id = iv.item_id",
-		"outlets o on o.id = i.outlet_id",
-		"settings s on s.business_id = o.business_id",
-		"iv.in_stock <= iv.stock_alert",
-		"iv.track_stock IS TRUE",
-		"iv.alert IS TRUE",
-		"s.inventory_alerts IS TRUE")
+	query := fmt.Sprintf("%s %s %s %s ( %s %s %s %s %s %s %s %s %s)",
+		"SELECT id",
+		"FROM businesses",
+		"WHERE NOW() < expired_at",
+		"AND id in",
+		"SELECT DISTINCT o.business_id",
+		"FROM item_variants iv",
+		"INNER JOIN items i on i.id = iv.item_id",
+		"INNER JOIN outlets o on o.id = i.outlet_id",
+		"INNER JOIN settings s on s.business_id = o.business_id",
+		"WHERE iv.in_stock <= iv.stock_alert",
+		"AND iv.track_stock IS TRUE",
+		"AND iv.alert IS TRUE",
+		"AND s.inventory_alerts IS TRUE")
 	db.Raw(query).Pluck("business_id", &businessIds)
 
 	return businessIds
