@@ -234,7 +234,7 @@ func GetTopItems(paymentIds []int64) []mpModel.TopItem {
 		mpUtil.Ints64ToString(paymentIds),
 		"is_refunded is false",
 		"item_name",
-		"quantity DESC")
+		"quantity DESC, item_name ASC")
 
 	var topItems []mpModel.TopItem
 	db.Raw(query).Scan(&topItems)
