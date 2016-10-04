@@ -15,7 +15,7 @@ const (
 	LimitListLowInventory = 15
 	CronSleepTime         = 2
 	DailySalesThread      = 2
-	LowInventoryThread    = 2
+	LowInventoryThread    = 1
 	LimitNameLength       = 30
 
 	FullRefund = "full"
