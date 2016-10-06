@@ -9,9 +9,7 @@ import (
 
 // TODO: use better way for get gross sales, for example store it in database
 func MakeGrossSales(grossSalesDatas []mpModel.GrossSales, paymentData mpModel.PaymentData) int64 {
-	var grossSales int64 = 0
-	grossSales = getGrossSalesFromArray(grossSalesDatas, paymentData, grossSales)
-	return grossSales
+	return getGrossSalesFromArray(grossSalesDatas, paymentData, 0)
 }
 
 // TODO: use better way to get refunds, for example store it in database

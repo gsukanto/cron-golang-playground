@@ -9,19 +9,19 @@ import (
 )
 
 func setAllBusinessIdsRecipient() {
-	mpRedis.DelAllBusinessIdsRecipient()
+	mpRedis.ClearAllBusinessIdsRecipient()
 	businessIds := mpPg.GetBusinessIdsWhereDailyOrLowIsTrue()
 	mpRedis.SetAllBusinessIdsRecipient(businessIds)
 }
 
 func setDailySalesBusinessIds() {
-	mpRedis.DelDailySalesBusinessId()
+	mpRedis.ClearDailySalesBusinessId()
 	businessIds := mpPg.GetDailyBusinessIdRecipients()
 	mpRedis.SetDailySalesBusinessIds(businessIds)
 }
 
 func setLowInventoryBusinessIds() {
-	mpRedis.DelLowInventoryBusinessIds()
+	mpRedis.ClearLowInventoryBusinessIds()
 	businessIds := mpPg.GetLowInventoryBusinessIds()
 	mpRedis.SetLowInventoryBusinessIds(businessIds)
 }

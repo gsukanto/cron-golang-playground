@@ -52,7 +52,7 @@ func TestMakeTimeSubstitude(t *testing.T) {
 	var substitudes []mpModel.Substitude
 	id, _ := time.LoadLocation("Asia/Jakarta")
 	substitudes = MakeTimeSubstitude(substitudes)
-	if substitudes[0].Value != time.Now().In(id).Format("Monday, 02/01/2006") {
+	if substitudes[0].Value != time.Now().In(id).AddDate(0, 0, -1).Format("Monday, 02/01/2006") {
 		t.Errorf("Make time substitudes failed with %v", substitudes)
 	}
 }

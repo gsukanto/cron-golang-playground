@@ -14,7 +14,7 @@ var (
 )
 
 func TestAllBusinessRecipient(t *testing.T) {
-	DelAllBusinessIdsRecipient()
+	ClearAllBusinessIdsRecipient()
 	SetAllBusinessIdsRecipient(ids)
 	allBusinessRecipientIds := GetAllBusinessIdsRecipient()
 
@@ -81,7 +81,7 @@ func TestBusinessEmailProfile(t *testing.T) {
 }
 
 func TestLowInventoryBusinessIds(t *testing.T) {
-	DelLowInventoryBusinessIds()
+	ClearLowInventoryBusinessIds()
 	SetLowInventoryBusinessIds(ids)
 	lowBusinessIds := GetLowInventoryBusinessIds()
 
@@ -97,7 +97,7 @@ func TestLowInventoryBusinessIds(t *testing.T) {
 }
 
 func TestLowBusinessIdEmailSucceed(t *testing.T) {
-	DelLowBusinessIdEmailSucceed()
+	ClearLowBusinessIdEmailSucceed()
 
 	for _, id := range ids {
 		SetLowBusinessIdEmailSucceed(id)
@@ -114,7 +114,7 @@ func TestLowBusinessIdEmailSucceed(t *testing.T) {
 }
 
 func TestLowBusinessIdEmailFailed(t *testing.T) {
-	DelLowBusinessIdEmailFailed()
+	ClearLowBusinessIdEmailFailed()
 
 	for _, id := range ids {
 		SetLowBusinessIdEmailFailed(id)
@@ -131,7 +131,7 @@ func TestLowBusinessIdEmailFailed(t *testing.T) {
 }
 
 func TestDailySalesBusinessId(t *testing.T) {
-	DelDailySalesBusinessId()
+	ClearDailySalesBusinessId()
 	SetDailySalesBusinessIds(ids)
 	gettedFailedEmailIds := GetDailySalesBusinessIds()
 	for i, v := range gettedFailedEmailIds {
@@ -145,7 +145,7 @@ func TestDailySalesBusinessId(t *testing.T) {
 }
 
 func TestDailyBusinessIdEmailSucceed(t *testing.T) {
-	DelDailyBusinessIdsEmailSucceed()
+	ClearDailyBusinessIdsEmailSucceed()
 
 	for _, id := range ids {
 		SetDailyBusinessIdEmailSucceed(id)
@@ -162,7 +162,7 @@ func TestDailyBusinessIdEmailSucceed(t *testing.T) {
 }
 
 func TestDailyBusinessIdEmailFailed(t *testing.T) {
-	DelDailyBusinessIdsEmailFailed()
+	ClearDailyBusinessIdsEmailFailed()
 
 	for _, id := range ids {
 		SetDailyBusinessIdEmailFailed(id)

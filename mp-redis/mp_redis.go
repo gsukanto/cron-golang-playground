@@ -56,7 +56,7 @@ func GetAllBusinessIdsRecipient() []int64 {
 	return result
 }
 
-func DelAllBusinessIdsRecipient() {
+func ClearAllBusinessIdsRecipient() {
 	DelKey(mpModel.AllBusinessRecipient)
 }
 
@@ -135,7 +135,7 @@ func CountListLowInventoryBusinessIds() int64 {
 	return result
 }
 
-func DelLowInventoryBusinessIds() {
+func ClearLowInventoryBusinessIds() {
 	DelKey(mpModel.LowInventoryBusinessIds)
 }
 
@@ -156,7 +156,7 @@ func CountLowBusinessIdEmailSucceed() int64 {
 	return result
 }
 
-func DelLowBusinessIdEmailSucceed() {
+func ClearLowBusinessIdEmailSucceed() {
 	DelKey(mpModel.LowBusinessIdsEmailSucceed)
 }
 
@@ -177,14 +177,14 @@ func CountLowBusinessIdEmailFailed() int64 {
 	return result
 }
 
-func DelLowBusinessIdEmailFailed() {
+func ClearLowBusinessIdEmailFailed() {
 	DelKey(mpModel.LowBusinessIdsEmailFailed)
 }
 
 func FlushAllLowBusiness() {
-	DelLowInventoryBusinessIds()
-	DelLowBusinessIdEmailSucceed()
-	DelLowBusinessIdEmailFailed()
+	ClearLowInventoryBusinessIds()
+	ClearLowBusinessIdEmailSucceed()
+	ClearLowBusinessIdEmailFailed()
 }
 
 /* ############################## End Low Inventory ############################## */
@@ -212,7 +212,7 @@ func CountDailySalesBusinessIds() int64 {
 	return result
 }
 
-func DelDailySalesBusinessId() {
+func ClearDailySalesBusinessId() {
 	DelKey(mpModel.DailySalesBusinessIds)
 }
 
@@ -235,7 +235,7 @@ func CountDailyBusinessIdsEmailSucceed() int64 {
 	return result
 }
 
-func DelDailyBusinessIdsEmailSucceed() {
+func ClearDailyBusinessIdsEmailSucceed() {
 	DelKey(mpModel.DailyBusinessIdsSuccess)
 }
 
@@ -258,14 +258,14 @@ func CountDailyBusinessIdsEmailFailed() int64 {
 	return result
 }
 
-func DelDailyBusinessIdsEmailFailed() {
+func ClearDailyBusinessIdsEmailFailed() {
 	DelKey(mpModel.DailyBusinessIdsFailed)
 }
 
 func FlushAllDailyBusiness() {
-	DelDailySalesBusinessId()
-	DelDailyBusinessIdsEmailSucceed()
-	DelDailyBusinessIdsEmailFailed()
+	ClearDailySalesBusinessId()
+	ClearDailyBusinessIdsEmailSucceed()
+	ClearDailyBusinessIdsEmailFailed()
 }
 
 /* ############################## End Daily Sales ############################## */

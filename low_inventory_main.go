@@ -12,7 +12,9 @@ import (
 	mpUtil "./mp-util"
 )
 
-// TODO: use proper html and css
+func appendSubstitude(substitudes []mpModel.Substitude, key string, value string) []mpModel.Substitude {
+	return append(substitudes, mpModel.Substitude{key, value})
+}
 
 func makeLowInventoryData(listLowInventory []mpModel.ItemVariantData) []mpModel.ItemVariantData {
 	for i, v := range listLowInventory {
@@ -21,6 +23,13 @@ func makeLowInventoryData(listLowInventory []mpModel.ItemVariantData) []mpModel.
 
 	return listLowInventory
 }
+
+// TODO: use proper html and css
+var thOutletNameStyling = `colspan='3' scope='row' style='background:#4769B0; color:#ddd;border:0px;'`
+var tdItemNameStyling = `style='padding-left:5px;border:0px;`
+var tdInStockStyling = `style='text-align: center;border:0px;`
+var tdAvgDailySalesStyling = `style='text-align: center;border:0px;`
+var unrenderedItemVariantsStyling = `style='border: none;text-align: left;padding: 8px;`
 
 func makeListLowInventorySubstitude(substitudes []mpModel.Substitude, businessId int64, count int64) []mpModel.Substitude {
 	var html string
@@ -64,9 +73,7 @@ func makeListLowInventorySubstitude(substitudes []mpModel.Substitude, businessId
 		html = fmt.Sprintf("%s%s", html, unrenderedItemVariants)
 	}
 
-	substitudes = append(substitudes, mpModel.Substitude{"list_item_variants", html})
-
-	return substitudes
+	return appendSubstitude(substitudes, "list_item_variants", html)
 }
 
 func makeLowInventorySubstitute(count int64, businessData mpModel.BusinessDataRecipients) []mpModel.Substitude {
@@ -74,9 +81,7 @@ func makeLowInventorySubstitute(count int64, businessData mpModel.BusinessDataRe
 
 	substitudes = mpHelper.MakeTimeSubstitude(substitudes)
 	substitudes = mpHelper.MakeBusinessDataSubstitude(substitudes, businessData)
-	substitudes = makeListLowInventorySubstitude(substitudes, businessData.BusinessId, count)
-
-	return substitudes
+	return makeListLowInventorySubstitude(substitudes, businessData.BusinessId, count)
 }
 
 func setEmailRedisStatus(statusCode int, businessId int64) {
@@ -117,8 +122,8 @@ func SendLowInventoryToSpecificEmails(businessId int64, emails []string) {
 func main() {
 	businessIds := mpRedis.GetLowInventoryBusinessIds()
 
-	mpRedis.DelLowBusinessIdEmailSucceed()
-	mpRedis.DelLowBusinessIdEmailFailed()
+	mpRedis.ClearLowBusinessIdEmailSucceed()
+	mpRedis.ClearLowBusinessIdEmailFailed()
 
 	for i, v := range businessIds {
 		if (i % mpModel.LowInventoryThread) == 0 {
@@ -129,21 +134,15 @@ func main() {
 	}
 
 	for {
-		if mpHelper.IsTotalEql(mpRedis.CountLowBusinessIdEmailSucceed(),
-			mpRedis.CountLowBusinessIdEmailFailed(),
-			mpRedis.CountListLowInventoryBusinessIds()) {
+		countSucceed := mpRedis.CountLowBusinessIdEmailSucceed()
+		countFailed := mpRedis.CountLowBusinessIdEmailFailed()
+		total := mpRedis.CountListLowInventoryBusinessIds()
 
-			mpUtil.SlackLowInventorySummary(mpRedis.CountListLowInventoryBusinessIds(),
-				mpRedis.CountLowBusinessIdEmailSucceed(), mpRedis.CountLowBusinessIdEmailFailed())
+		if mpHelper.IsTotalEql(countSucceed, countFailed, total) {
+			mpUtil.SlackLowInventorySummary(total, countSucceed, countFailed)
 			break
 		}
 
 		time.Sleep(mpModel.CronSleepTime)
 	}
 }
-
-var thOutletNameStyling = `colspan='3' scope='row' style='background:#4769B0; color:#ddd;border:0px;'`
-var tdItemNameStyling = `style='padding-left:5px;border:0px;`
-var tdInStockStyling = `style='text-align: center;border:0px;`
-var tdAvgDailySalesStyling = `style='text-align: center;border:0px;`
-var unrenderedItemVariantsStyling = `style='border: none;text-align: left;padding: 8px;`

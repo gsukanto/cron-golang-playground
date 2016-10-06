@@ -12,7 +12,15 @@ import (
 	mpUtil "./mp-util"
 )
 
+func appendSubstitude(substitudes []mpModel.Substitude, key string, value string) []mpModel.Substitude {
+	return append(substitudes, mpModel.Substitude{key, value})
+}
+
 // TODO: use proper html and css
+var tdIndexStyling = `style='border: none;text-align: left;padding: 8px;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;mso-table-lspace: 0pt;mso-table-rspace: 0pt;'`
+var tdItemNameStyling = `style='border: none;text-align: left;padding: 8px;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;mso-table-lspace: 0pt;mso-table-rspace: 0pt;'`
+var tdRevenueStyling = `style='border: none;text-align: left;padding: 8px;color: #969696;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;mso-table-lspace: 0pt;mso-table-rspace: 0pt;'`
+var tdQuantityStyling = `style='border: none;text-align: center;padding: 8px;color: #969696;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;mso-table-lspace: 0pt;mso-table-rspace: 0pt;'`
 
 func makeTopItemsSubstitude(substitudes []mpModel.Substitude, paymentIds []int64) []mpModel.Substitude {
 	var html string
@@ -44,9 +52,7 @@ func makeTopItemsSubstitude(substitudes []mpModel.Substitude, paymentIds []int64
 		html = fmt.Sprintf("%s%s", html, tableTopItems)
 	}
 
-	substitudes = append(substitudes, mpModel.Substitude{"list_of_top_items", html})
-
-	return substitudes
+	return appendSubstitude(substitudes, "list_of_top_items", html)
 }
 
 func makeDailySalesPaymentDatasSubstitute(substitudes []mpModel.Substitude, paymentIds []int64) []mpModel.Substitude {
@@ -84,15 +90,13 @@ func makeDailySalesPaymentDatasSubstitute(substitudes []mpModel.Substitude, paym
 		}
 	}
 
-	substitudes = append(substitudes, mpModel.Substitude{"discounts", mpUtil.Int64ToRupiah(discounts)})
-	substitudes = append(substitudes, mpModel.Substitude{"gratuity", mpUtil.Int64ToRupiah(gratuity)})
-	substitudes = append(substitudes, mpModel.Substitude{"tax", mpUtil.Int64ToRupiah(tax)})
-	substitudes = append(substitudes, mpModel.Substitude{"gross_sales", mpUtil.Int64ToRupiah(grossSales)})
-	substitudes = append(substitudes, mpModel.Substitude{"refunds", mpUtil.Int64ToRupiah(refunds)})
-	substitudes = append(substitudes, mpModel.Substitude{"net_sales", mpUtil.Int64ToRupiah(netSales)})
-	substitudes = append(substitudes, mpModel.Substitude{"total_collected", mpUtil.Int64ToRupiah(totalCollected)})
-
-	return substitudes
+	substitudes = appendSubstitude(substitudes, "discounts", mpUtil.Int64ToRupiah(discounts))
+	substitudes = appendSubstitude(substitudes, "gratuity", mpUtil.Int64ToRupiah(gratuity))
+	substitudes = appendSubstitude(substitudes, "tax", mpUtil.Int64ToRupiah(tax))
+	substitudes = appendSubstitude(substitudes, "gross_sales", mpUtil.Int64ToRupiah(grossSales))
+	substitudes = appendSubstitude(substitudes, "refunds", mpUtil.Int64ToRupiah(refunds))
+	substitudes = appendSubstitude(substitudes, "net_sales", mpUtil.Int64ToRupiah(netSales))
+	return appendSubstitude(substitudes, "total_collected", mpUtil.Int64ToRupiah(totalCollected))
 }
 
 func makeYesterdayPaymentIds(businessId int64) []int64 {
@@ -111,9 +115,7 @@ func makeDailySalesSubstitute(businessData mpModel.BusinessDataRecipients) []mpM
 	substitudes = mpHelper.MakeTimeSubstitude(substitudes)
 	substitudes = mpHelper.MakeBusinessDataSubstitude(substitudes, businessData)
 	substitudes = makeDailySalesPaymentDatasSubstitute(substitudes, paymentIds)
-	substitudes = makeTopItemsSubstitude(substitudes, paymentIds)
-
-	return substitudes
+	return makeTopItemsSubstitude(substitudes, paymentIds)
 }
 
 func setEmailRedisStatus(statusCode int, businessId int64) {
@@ -143,8 +145,8 @@ func SendDailySalesToSpecificEmails(businessId int64, emails []string) {
 func main() {
 	businessIds := mpRedis.GetDailySalesBusinessIds()
 
-	mpRedis.DelDailyBusinessIdsEmailSucceed()
-	mpRedis.DelDailyBusinessIdsEmailFailed()
+	mpRedis.ClearDailyBusinessIdsEmailSucceed()
+	mpRedis.ClearDailyBusinessIdsEmailFailed()
 
 	for i, v := range businessIds {
 		if (i % mpModel.DailySalesThread) == 0 {
@@ -155,20 +157,15 @@ func main() {
 	}
 
 	for {
-		if mpHelper.IsTotalEql(mpRedis.CountDailyBusinessIdsEmailSucceed(),
-			mpRedis.CountDailyBusinessIdsEmailFailed(),
-			mpRedis.CountDailySalesBusinessIds()) {
+		countSucceed := mpRedis.CountDailyBusinessIdsEmailSucceed()
+		countFailed := mpRedis.CountDailyBusinessIdsEmailFailed()
+		total := mpRedis.CountDailySalesBusinessIds()
 
-			mpUtil.SlackDailySalesSummary(mpRedis.CountDailySalesBusinessIds(),
-				mpRedis.CountDailyBusinessIdsEmailSucceed(), mpRedis.CountDailyBusinessIdsEmailFailed())
+		if mpHelper.IsTotalEql(countSucceed, countFailed, total) {
+			mpUtil.SlackDailySalesSummary(total,countSucceed, countFailed)
 			break
 		}
 
 		time.Sleep(mpModel.CronSleepTime)
 	}
 }
-
-var tdIndexStyling = `style='border: none;text-align: left;padding: 8px;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;mso-table-lspace: 0pt;mso-table-rspace: 0pt;'`
-var tdItemNameStyling = `style='border: none;text-align: left;padding: 8px;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;mso-table-lspace: 0pt;mso-table-rspace: 0pt;'`
-var tdRevenueStyling = `style='border: none;text-align: left;padding: 8px;color: #969696;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;mso-table-lspace: 0pt;mso-table-rspace: 0pt;'`
-var tdQuantityStyling = `style='border: none;text-align: center;padding: 8px;color: #969696;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;mso-table-lspace: 0pt;mso-table-rspace: 0pt;'`
