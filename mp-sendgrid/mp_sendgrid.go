@@ -80,7 +80,7 @@ func mailSend(body string) int {
 
 func SendLowInventory(substitude []mpModel.Substitude, emails []string) int {
 	subject := "Low Inventory - Daily"
-	fromEmail := "no-reply@testmokapos.com"
+	fromEmail := "no-reply@mokapos.com"
 	templateId := os.Getenv("TEMPLATE_ID_LOW_INVENTORY")
 
 	EmailHeader := mpModel.EmailHeader{subject, emails, substitude}
@@ -91,7 +91,7 @@ func SendLowInventory(substitude []mpModel.Substitude, emails []string) int {
 
 func SendDailySales(substitude []mpModel.Substitude, emails []string) int {
 	subject := "Sales Summary - Daily"
-	fromEmail := "no-reply@testmokapos.com"
+	fromEmail := "no-reply@mokapos.com"
 	templateId := os.Getenv("TEMPLATE_ID_DAILY_SALES")
 
 	EmailHeader := mpModel.EmailHeader{subject, emails, substitude}
